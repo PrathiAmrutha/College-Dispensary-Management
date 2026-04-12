@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Health Record</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .medicine-group { margin-bottom: 10px; }
+        .medicine-group input { margin-right: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Add Health Record</h2>
+
+        <label>Roll Number</label>
+        <input type="number" id="roll_no" placeholder="Enter roll number">
+
+        <label>Symptoms</label>
+        <input type="text" id="symptoms" placeholder="Enter symptoms">
+
+        <label>Date of Visit</label>
+        <input type="date" id="date" placeholder="Enter date">
+
+        <h3>Prescription</h3>
+        <div id="prescriptions">
+            <div class="medicine-group">
+                <input type="text" class="medicine_name" placeholder="Medicine Name">
+                <input type="text" class="dose" placeholder="Dose">
+                <input type="text" class="time_intake" placeholder="Time (Morning/Noon/Night)">
+                <button type="button" onclick="removeMedicine(this)">Remove</button>
+            </div>
+        </div>
+        <button type="button" onclick="addMedicine()">Add Another Medicine</button>
+
+        <br><br>
+        <button type="button" onclick="addHealthRecord()">Add Record</button>
+        <p class="msg" id="msg"></p>
+
+        <div class="back-btn">
+            <a href="index.html">Back to Dashboard</a>
+        </div>
+    </div>
+
+    <script>
+        function addMedicine() {
+            const div = document.createElement("div");
+            div.className = "medicine-group";
+            div.innerHTML = `
+                <input type="text" class="medicine_name" placeholder="Medicine Name">
+                <input type="text" class="dose" placeholder="Dose">
+                <input type="text" class="time_intake" placeholder="Time (Morning/Noon/Night)">
+                <button type="button" onclick="removeMedicine(this)">Remove</button>
+            `;
+            document.getElementById("prescriptions").appendChild(div);
+        }
+
+        function removeMedicine(btn) {
+            btn.parentElement.remove();
+        }
+
+        
+        function addHealthRecord() {
+            //console.log('add');
+            const date = document.getElementById("date").value;
+            const roll_no = document.getElementById("roll_no").value;
+            const symptoms = document.getElementById("symptoms").value;
+
+            // Collect all medicines
+            const prescriptions = [];
+            const medicineDivs = document.querySelectorAll(".medicine-group");
+            medicineDivs.forEach(div => {
+                const med = div.querySelector(".medicine_name").value;
+                const dose = div.querySelector(".dose").value;
+                const time = div.querySelector(".time_intake").value;
+                if(med && dose && time) {
+                    prescriptions.push({ medicine_name: med, dose: dose, time_intake: time });
+                }
+            });
+
+            if (!date || !roll_no || !symptoms || prescriptions.length === 0) {
+                document.getElementById("msg").innerText = "All fields are required!";
+                document.getElementById("msg").style.color = "red";
+                return;
+            }
+
+            fetch('http://localhost:3000/addHealth', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ roll_no, symptoms, prescription: JSON.stringify(prescriptions), date })
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById("msg").innerText = data.message;
+                document.getElementById("msg").style.color = "green";
+            })
+            .catch(err => {
+                document.getElementById("msg").innerText = "Error connecting to server";
+                document.getElementById("msg").style.color = "red";
+            });
+        }
+    </script>
+
+</body>
+</html>

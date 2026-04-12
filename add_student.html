@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Add Student</h2>
+
+        <label>Roll Number: </label>
+        <input type="number" id="RollNo" placeholder="Enter roll number">
+
+        <label>Name: </label>
+        <input type="text" id="Name" placeholder="Enter name">
+
+        <label>Branch: </label>
+        <input type="text" id="Branch" placeholder="Enter branch">
+
+        <button onclick="addStudent()">Add Student</button>
+        <p id="message" class="msg"></p>
+
+        <div class="back">
+            <a href="index.html">Back to Home page</a>
+        </div>
+    </div>
+
+    <script>
+        function addStudent() {
+        let roll = document.getElementById("RollNo").value;
+        let name = document.getElementById("Name").value;
+        let branch = document.getElementById("Branch").value;
+
+        if (!roll || !name || !branch) {
+            document.getElementById("message").innerText = "All fields are required!";
+            document.getElementById("message").style.color = "red";
+            return;
+        }
+
+        fetch('http://localhost:3000/addStudent', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ roll_no: roll, name: name, branch: branch })
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("message").innerText = data.message;
+            document.getElementById("message").style.color = "green";
+        })
+        .catch(err => {
+            document.getElementById("message").innerText = "Error connecting to server";
+            document.getElementById("message").style.color = "red";
+        });
+        }
+    </script>
+</body>
+</html>

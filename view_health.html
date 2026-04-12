@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>View Health Records</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+
+        <div class="container">
+            <h2>View Health Records</h2>
+
+            <label>Roll Number</label>
+            <input type="number" id="rollNo" placeholder="Enter roll number">
+
+            <button onclick="viewHealth()">View Records</button>
+
+            <p id="message" class="msg"></p>
+            <div id="records" style="margin-top:20px;"></div>
+
+            <div class="back-btn">
+                <a href="index.html">Back to Dashboard</a>
+            </div>
+        </div>
+
+        <script>
+            function viewHealth() 
+            {
+                const roll_no = document.getElementById("rollNo").value;
+
+                if (!roll_no) {
+                    document.getElementById("message").innerText = "Enter a roll number!";
+                    document.getElementById("message").style.color = "red";
+                    return;
+                }
+
+                fetch(`http://localhost:3000/viewHealth/${roll_no}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.message) {
+                            document.getElementById("message").innerText = data.message;
+                            document.getElementById("message").style.color = "red";
+                            document.getElementById("records").innerHTML = "";
+                            return;
+                        }
+
+                        document.getElementById("message").innerText = `Health records for ${data.student.name} (Branch: ${data.student.branch})`;
+                        document.getElementById("message").style.color = "green";
+
+                        let html = `
+                        <table border='1' cellpadding='8' cellspacing ='0'>
+                            <tr>
+                                <th>#</th>
+                                <th>Symptoms</th>
+                                <th>Date</th>
+                                <th>Prescription</th>
+                            </tr>
+                        `;
+
+                        data.records.forEach((rec, idx) => {
+                            html += `
+                            <tr>
+                                <td>${idx + 1}</td>
+                                <td>${rec.symptoms}</td>
+                                <td>${new Date(rec.date).toLocaleDateString()}</td>
+                                <td>
+                                    <button onclick='showPrescription(${JSON.stringify(rec.prescription)})'>
+                                        View Prescription
+                                    </button>
+                                </td>
+                            </tr>`;
+                        });
+
+                        html += "</table>";
+
+                        document.getElementById("records").innerHTML = html;
+                    })
+                    .catch(err => {
+                        document.getElementById("message").innerText = "Error fetching records!";
+                        document.getElementById("message").style.color = "red";
+                        document.getElementById("records").innerHTML = "";
+                    });
+            }
+
+            function showPrescription(prescriptionList) 
+            {
+                if (!prescriptionList || prescriptionList.length === 0) {
+                    alert("No prescription data available.");
+                    return;
+                }
+
+                let table = `
+                <table border="1" cellpadding="8" cellspacing="0">
+                    <tr>
+                        <th>Medicine</th>
+                        <th>Dose</th>
+                        <th>Time</th>
+                    </tr>
+                `;
+
+                prescriptionList.forEach(item => {
+                    table += `
+                    <tr>
+                        <td>${item.medicine_name}</td>
+                        <td>${item.dose}</td>
+                        <td>${item.time_intake}</td>
+                    </tr>`;
+                });
+
+                table += "</table>";
+
+                
+                let popup = window.open("", "Prescription", "width=400,height=400");
+                popup.document.write(`<h3>Prescription Details</h3>${table}`);
+            }
+        </script>
+    </body>
+</html>
