@@ -9,25 +9,49 @@
     <body>
 
         <div class="container">
-            <h2>View Health Records</h2>
+            <div class="dashboard-header compact">
+                <div>
+                    <p class="eyebrow">Student access</p>
+                    <h2>View Health Records</h2>
+                </div>
+                <button class="secondary" onclick="logout()">Logout</button>
+            </div>
 
             <label>Roll Number</label>
-            <input type="number" id="rollNo" placeholder="Enter roll number">
+            <input type="text" id="rollNo" placeholder="Enter roll number">
 
             <button onclick="viewHealth()">View Records</button>
 
             <p id="message" class="msg"></p>
             <div id="records" style="margin-top:20px;"></div>
 
+            <div id="prescriptionModal"
+                style="display:none; position:fixed; top:50%; left:50%;
+                transform:translate(-50%,-50%);
+                background:white; padding:20px;
+                border:1px solid black;
+                border-radius:10px;
+                box-shadow:0px 0px 10px gray;">
+
+                <h3>Prescription Details</h3>
+
+                <div id="prescriptionTable"></div>
+
+                <br>
+
+                <button onclick="closePrescription()">Close</button>
+
+            </div>
+
             <div class="back-btn">
-                <a href="index.html">Back to Dashboard</a>
+                <a id="backLink" href="index.html">Back to Dashboard</a>
             </div>
         </div>
 
         <script>
-            function viewHealth() 
+            function viewHealth(rollNo = null) 
             {
-                const roll_no = document.getElementById("rollNo").value;
+                const roll_no = rollNo || document.getElementById("rollNo").value;
 
                 if (!roll_no) {
                     document.getElementById("message").innerText = "Enter a roll number!";
@@ -35,7 +59,7 @@
                     return;
                 }
 
-                fetch(`http://localhost:3000/viewHealth/${roll_no}`)
+                fetch(`${window.location.origin}/viewHealth/${roll_no}`)
                     .then(res => res.json())
                     .then(data => {
                         if (data.message) {
@@ -83,7 +107,7 @@
                     });
             }
 
-            function showPrescription(prescriptionList) 
+            function showPrescription(prescriptionList)
             {
                 if (!prescriptionList || prescriptionList.length === 0) {
                     alert("No prescription data available.");
@@ -110,9 +134,39 @@
 
                 table += "</table>";
 
-                
-                let popup = window.open("", "Prescription", "width=400,height=400");
-                popup.document.write(`<h3>Prescription Details</h3>${table}`);
+                document.getElementById("prescriptionTable").innerHTML = table;
+                document.getElementById("prescriptionModal").style.display = "block";
+            }
+
+            function closePrescription()
+            {
+                document.getElementById("prescriptionModal").style.display = "none";
+            }
+
+            function logout() {
+                sessionStorage.clear();
+                window.location.href = 'login.html';
+            }
+
+            const savedRollNo = sessionStorage.getItem('rollNo') || sessionStorage.getItem('studentRollNo') || '';
+            const userRole = sessionStorage.getItem('userRole');
+
+            if (userRole === 'student') {
+                document.getElementById('backLink').textContent = 'Back to Login';
+                document.getElementById('backLink').href = 'login.html';
+            }
+
+            if (savedRollNo) {
+                document.getElementById('rollNo').value = savedRollNo;
+                if (userRole === 'student') {
+                    document.getElementById('message').innerText = 'Loading your records...';
+                    document.getElementById('message').style.color = '#3452d9';
+                    viewHealth(savedRollNo);
+                }
+            }
+
+            if (!userRole) {
+                window.location.href = 'login.html';
             }
         </script>
     </body>

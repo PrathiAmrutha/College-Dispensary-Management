@@ -4,15 +4,111 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hostel Health Dashboard</title>
-    <link rel='stylesheet' href="style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h2>Hostel Health System</h2>
+    <div class="container dashboard">
+        <div class="dashboard-header">
+            <div>
+                <p class="eyebrow">Doctor portal</p>
+                <h2>Hostel Health Dashboard</h2>
+            </div>
+            <div class="dashboard-user">
+                <span id="roleBadge" class="badge">Doctor</span>
+                <strong id="welcomeName">Dr. Doctor</strong>
+                <div class="profile-menu" style="display:inline-block; margin-left:12px;">
+                    <button onclick="toggleProfile()">Profile ▾</button>
+                    <div id="profileDropdown" style="display:none; position:absolute; right:20px; background:#fff; border:1px solid #ccc; padding:8px;">
+                        <div style="margin-bottom:8px;"><a href="#" onclick="openProfile()">Profile</a></div>
+                        <div><a href="#" onclick="logout()">Logout</a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <button onclick="location.href= 'add_student.html'">Add Student</button>
-        <button onclick="location.href= 'add_health.html'">Add Health data</button>
-        <button onclick="location.href= 'view_health.html'">View Health Data</button>
+        <div class="dashboard-actions">
+            <button onclick="location.href='add_student.html'">Add Student</button>
+            <button onclick="location.href='add_health.html'">Add Health Data</button>
+            <button onclick="location.href='view_health.html'">View Health Data</button>
+            <button class="secondary" onclick="logout()">Logout</button>
+        </div>
+
+        <div class="quick-access">
+            <label for="studentRoll">Quick student record access</label>
+            <div class="inline-row">
+                <input type="text" id="studentRoll" placeholder="Enter roll number">
+                <button type="button" onclick="openStudentRecord()">Open Record</button>
+            </div>
+        </div>
+
+        <div id="dashboardSummary" class="summary-grid">
+            <div class="summary-card">
+                <h3>Total registered students</h3>
+                <p id="totalStudents">0</p>
+            </div>
+            <div class="summary-card">
+                <h3>Total health visits</h3>
+                <p id="totalVisits">0</p>
+            </div>
+            <div class="summary-card">
+                <h3>Today's patients</h3>
+                <p id="todayPatients">0</p>
+            </div>
+        </div>
+
+        <div class="dashboard-sections">
+            <div class="panel">
+                <h3>Frequent visitors</h3>
+                <ul id="frequentVisitors"></ul>
+            </div>
+            <div class="panel">
+                <h3>Most common complaints</h3>
+                <ul id="commonComplaints"></ul>
+            </div>
+        </div>
+
+        <div class="panel full-width">
+            <h3>Recent health records</h3>
+            <ul id="recentRecords"></ul>
+        </div>
     </div>
+
+    <script src="dashboard.js"></script>
+    <script>
+        function logout() {
+            sessionStorage.clear();
+            window.location.href = 'login.html';
+        }
+
+        function openStudentRecord() {
+            const rollNo = document.getElementById('studentRoll').value.trim();
+            if (!rollNo) {
+                alert('Enter a roll number first');
+                return;
+            }
+            sessionStorage.setItem('rollNo', rollNo);
+            window.location.href = 'view_health.html';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedRollNo = sessionStorage.getItem('rollNo') || '';
+            if (savedRollNo) {
+                document.getElementById('studentRoll').value = savedRollNo;
+            }
+        });
+
+        if (!sessionStorage.getItem('userRole')) {
+            window.location.href = 'login.html';
+        }
+
+        function toggleProfile() {
+            const el = document.getElementById('profileDropdown');
+            el.style.display = el.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function openProfile() {
+            alert('Profile page not yet implemented');
+        }
+    </script>
 </body>
 </html>

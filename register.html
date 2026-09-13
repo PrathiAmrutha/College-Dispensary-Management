@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container auth-card">
+        <h2>Create Account</h2>
+        <p class="subtitle">Choose role and fill details to create your account.</p>
+
+        <div class="role-picker">
+            <button type="button" class="role-option active" data-role="student">Student</button>
+            <button type="button" class="role-option" data-role="doctor">Doctor</button>
+        </div>
+
+        <form id="registerForm">
+            <label for="name">Name</label>
+            <input type="text" id="name" placeholder="Enter full name" required>
+
+            <div id="studentOnly">
+                <label for="rollNo">Roll Number</label>
+                <input type="text" id="rollNo" placeholder="Enter roll number">
+            </div>
+
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Enter username" required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter password" required>
+
+            <label for="phone">Phone Number</label>
+            <input type="text" id="phone" placeholder="Enter phone number">
+
+            <label for="email">College Email</label>
+            <input type="email" id="email" placeholder="Enter email">
+
+            <button type="submit">Create Account</button>
+        </form>
+
+        <p id="message" class="msg"></p>
+        <div class="back-btn">
+            <a href="login.html">Back to Login</a>
+        </div>
+    </div>
+
+    <script>
+        const roleButtons = document.querySelectorAll('.role-option');
+        const studentOnly = document.getElementById('studentOnly');
+        const messageBox = document.getElementById('message');
+        const apiBase = window.location.origin && window.location.origin !== 'null'
+            ? window.location.origin
+            : 'http://localhost:3000';
+
+        roleButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                roleButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                const role = button.dataset.role;
+                studentOnly.style.display = role === 'student' ? 'block' : 'none';
+            });
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const role = document.querySelector('.role-option.active').dataset.role;
+            const name = document.getElementById('name').value.trim();
+            const rollNo = document.getElementById('rollNo').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const email = document.getElementById('email').value.trim();
+
+            messageBox.textContent = 'Creating account...';
+            messageBox.style.color = '#3452d9';
+
+            try {
+                const payload = { role, name, username, password, phone, email };
+                if (role === 'student') payload.roll_no = rollNo;
+
+                const response = await fetch(`${apiBase}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    messageBox.textContent = data.message || 'Account creation failed';
+                    messageBox.style.color = 'red';
+                    return;
+                }
+
+                messageBox.textContent = data.message;
+                messageBox.style.color = 'green';
+                document.getElementById('registerForm').reset();
+            } catch (error) {
+                messageBox.textContent = 'Unable to reach the server';
+                messageBox.style.color = 'red';
+            }
+        });
+    </script>
+</body>
+</html>

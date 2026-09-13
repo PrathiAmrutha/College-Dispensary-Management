@@ -11,7 +11,7 @@
         <h2>Add Student</h2>
 
         <label>Roll Number: </label>
-        <input type="number" id="RollNo" placeholder="Enter roll number">
+        <input type="text" id="RollNo" placeholder="Enter roll number (e.g. 24CSB01)">
 
         <label>Name: </label>
         <input type="text" id="Name" placeholder="Enter name">
@@ -39,7 +39,14 @@
             return;
         }
 
-        fetch('http://localhost:3000/addStudent', {
+        const rollPattern = /^\d{2}(CS|EC|EE|ME|CE|CH|BT|MT|PH)\d{1}[A-Z]\d{2}$/i;
+        if (!rollPattern.test(roll)) {
+            document.getElementById("message").innerText = "Roll number must follow YYBRC0NO format, e.g. 24CSB01";
+            document.getElementById("message").style.color = "red";
+            return;
+        }
+
+        fetch(`${window.location.origin}/addStudent`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ roll_no: roll, name: name, branch: branch })

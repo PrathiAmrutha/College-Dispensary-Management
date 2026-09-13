@@ -1,7 +1,7 @@
 /* ---- Global Styling ---- */
 body {
     font-family: "Segoe UI", Arial, sans-serif;
-    background: #eef3ff;
+    background: linear-gradient(135deg, #eef3ff 0%, #f7f9ff 100%);
     margin: 0;
     padding: 0;
     display: flex;
@@ -12,12 +12,16 @@ body {
 
 /* ---- Main Card ---- */
 .container {
-    width: 420px;
-    margin-top: 40px;
+    width: min(900px, 92vw);
+    margin: 40px 0;
     background: #ffffff;
     padding: 30px 25px;
     border-radius: 16px;
     box-shadow: 0px 6px 18px rgba(0,0,0,0.12);
+}
+
+.auth-card {
+    width: 420px;
 }
 
 h2 {
@@ -119,4 +123,169 @@ button:hover {
     color: #4a6cf7;
     text-decoration: none;
     font-weight: bold;
+}
+
+.subtitle {
+    text-align: center;
+    color: #5a647b;
+    margin-top: -8px;
+    margin-bottom: 16px;
+}
+
+.role-picker {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.role-option {
+    background: #e8ebff;
+    color: #1f3bd2;
+    border: 1px solid #cfd7ff;
+}
+
+.role-option.active {
+    background: #4a6cf7;
+    color: white;
+}
+
+.auth-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.auth-actions button {
+    flex: 1;
+}
+
+.dashboard {
+    width: min(980px, 94vw);
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.dashboard-header.compact {
+    margin-bottom: 8px;
+}
+
+.eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: 0.75rem;
+    color: #4a6cf7;
+    margin: 0 0 4px;
+    font-weight: 700;
+}
+
+.badge {
+    display: inline-block;
+    background: #e8ebff;
+    color: #1f3bd2;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    margin-right: 8px;
+}
+
+.dashboard-actions {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.quick-access {
+    background: #f7f9ff;
+    border: 1px solid #e5ebff;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 16px;
+}
+
+.inline-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.inline-row input {
+    margin: 0;
+}
+
+.inline-row button {
+    width: auto;
+    margin: 0;
+    padding: 10px 14px;
+}
+
+.secondary {
+    background: #2e8b57;
+}
+
+.secondary:hover {
+    background: #226b43;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.summary-card, .panel {
+    background: #f7f9ff;
+    border: 1px solid #e5ebff;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.summary-card h3, .panel h3 {
+    margin-top: 0;
+    color: #243b6b;
+    font-size: 1rem;
+}
+
+.summary-card p {
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: #1f3bd2;
+    margin-bottom: 0;
+}
+
+.dashboard-sections {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.full-width {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+ul {
+    padding-left: 18px;
+    color: #374151;
+}
+
+@media (max-width: 768px) {
+    .dashboard-actions,
+    .summary-grid,
+    .dashboard-sections {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }

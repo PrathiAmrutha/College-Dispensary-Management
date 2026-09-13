@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hostel Health Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container auth-card">
+        <h2>Hostel Health Access</h2>
+        <p class="subtitle">Choose your role and continue with either sign up or login.</p>
+
+        <div class="role-picker">
+            <button type="button" class="role-option active" data-role="doctor">Doctor</button>
+            <button type="button" class="role-option" data-role="student">Student</button>
+        </div>
+
+        <form id="authForm">
+            <div id="studentFields" hidden>
+                <label for="rollNo">Roll Number</label>
+                <input type="text" id="rollNo" placeholder="Enter roll number (e.g. 22A or 1001A)">
+            </div>
+
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Enter username" required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter password" required>
+
+            <div class="auth-actions">
+                <button type="button" id="signupBtn">Create Account</button>
+                <button type="button" id="loginBtn">Login</button>
+            </div>
+        </form>
+
+        <p id="message" class="msg"></p>
+    </div>
+
+    <script>
+        const roleButtons = document.querySelectorAll('.role-option');
+        const studentFields = document.getElementById('studentFields');
+        const messageBox = document.getElementById('message');
+        const signupBtn = document.getElementById('signupBtn');
+        const loginBtn = document.getElementById('loginBtn');
+        const apiBase = window.location.origin && window.location.origin !== 'null'
+            ? window.location.origin
+            : 'http://localhost:3000';
+
+        roleButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                roleButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                const role = button.dataset.role;
+                studentFields.hidden = role !== 'student';
+            });
+        });
+
+        async function submitAuth(action) {
+            const role = document.querySelector('.role-option.active').dataset.role;
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const rollNo = document.getElementById('rollNo').value.trim();
+
+            if (role === 'student' && !rollNo) {
+                messageBox.textContent = 'Roll number is required for student accounts';
+                messageBox.style.color = 'red';
+                return;
+            }
+
+            messageBox.textContent = action === 'signup' ? 'Creating account...' : 'Signing in...';
+            messageBox.style.color = '#3452d9';
+
+            try {
+                const endpoint = action === 'signup' ? '/register' : '/login';
+                const response = await fetch(`${apiBase}${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ role, username, password, roll_no: rollNo })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    messageBox.textContent = data.message || 'Request failed';
+                    messageBox.style.color = 'red';
+                    return;
+                }
+
+                if (action === 'signup') {
+                    messageBox.textContent = data.message;
+                    messageBox.style.color = 'green';
+                    document.getElementById('authForm').reset();
+                    studentFields.hidden = true;
+                    document.querySelector('.role-option[data-role="doctor"]').classList.add('active');
+                    document.querySelector('.role-option[data-role="student"]').classList.remove('active');
+                } else {
+                    sessionStorage.setItem('userRole', role);
+                    sessionStorage.setItem('username', username);
+                    sessionStorage.setItem('rollNo', rollNo || '');
+
+                    if (role === 'doctor') {
+                        window.location.href = 'index.html';
+                    } else {
+                        window.location.href = 'view_health.html';
+                    }
+                }
+            } catch (error) {
+                messageBox.textContent = 'Unable to reach the server';
+                messageBox.style.color = 'red';
+            }
+        }
+
+        signupBtn.addEventListener('click', () => {
+            window.location.href = 'register.html';
+        });
+        loginBtn.addEventListener('click', () => submitAuth('login'));
+    </script>
+</body>
+</html>
